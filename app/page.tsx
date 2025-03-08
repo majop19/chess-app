@@ -12,16 +12,6 @@ export default function Home() {
       <Card>
         <CardContent>
           <CardTitle>Salut !</CardTitle>
-          <p className="font-bold text-3xl">Bonjour je m'appelle matteo</p>
-          <Button onClick={() => signIn()} variant="destructive">
-            Sign In
-          </Button>
-          <Button onClick={() => signOut()}>Sign out</Button>
-          <div>
-            <p>{user?.id}</p>
-            <p>{user?.email}</p>
-            <p>{user?.name}</p>
-          </div>
         </CardContent>
       </Card>
     </div>

@@ -7,7 +7,11 @@ import Google from "next-auth/providers/google";
 import NodeMailer from "next-auth/providers/nodemailer";
 import { createTransport } from "nodemailer";
 
-export const { auth: baseAuth, handlers } = NextAuth({
+export const {
+  auth: baseAuth,
+  handlers,
+  signIn,
+} = NextAuth({
   debug: true,
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -40,6 +44,17 @@ export const { auth: baseAuth, handlers } = NextAuth({
       session.user.id = user.id;
       session.user.image = user.image;
       return session;
+    },
+    async signIn({ user }) {
+      if (!user.name) {
+        user.name = user.email?.includes("@")
+          ? user.email.split("@")[0]
+          : `User_${Math.floor(Math.random() * 10000)}`;
+      }
+      if (!user.image) {
+        user.image = `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`;
+      }
+      return true;
     },
   },
 });
