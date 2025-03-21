@@ -47,10 +47,68 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  gamesAsWhite Game[]    @relation("WhitePlayer")
+  gamesAsBlack Game[]    @relation("BlackPlayer")
+  accounts     Account[]
+  sessions     Session[]
+
+  imageCloudinaryId String? @unique
+  imageCloudinary   Image?  @relation(fields: [imageCloudinaryId], references: [id], onDelete: Cascade)
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  url       String
+  publicId  String // Cloudinary public_id
+  fileName  String?
+  fileSize  Int?
+  fileType  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User?
+}
+
+model Game {
+  id              String   @id @default(uuid())
+  whiteId         String
+  blackId         String
+  winner          String? // "white", "black", or null for ongoing games
+  timeControl     String // e.g., "10+5" (10 minutes + 5 seconds increment)
+  isRated         Boolean  @default(false)
+  status          String   @default("waiting") // "waiting", "active", "checkmate", "stalemate", "draw", "resigned", "timeout"
+  turn            String   @default("white") // "white" or "black"
+  pgn             String? // Store game moves in PGN format
+  boardState      String   @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") // FEN notation
+  castlingRights  String   @default("KQkq") // Droits de roque (peut être extrait de FEN)
+  enPassantTarget String? // Case cible pour la prise en passant (peut être extraite de FEN)
+  halfMoveClock   Int      @default(0) // Demi-coups depuis la dernière capture ou mouvement de pion (pour la règle des 50 coups)
+  fullMoveNumber  Int      @default(1) // Numéro de coup complet (s'incrémente après le coup des Noirs)
+  whiteTime       Int? // Remaining time for white (seconds)
+  blackTime       Int? // Remaining time for black (seconds)
+  createdAt       DateTime @default(now())
+  moves           Move[]
+
+  white User @relation("WhitePlayer", fields: [whiteId], references: [id])
+  black User @relation("BlackPlayer", fields: [blackId], references: [id])
+}
+
+model Move {
+  id            String   @id @default(uuid())
+  gameId        String
+  moveNumber    Int
+  color         String // "white" or "black"
+  notation      String // PGN notation (e.g., "e4", "Nf3")
+  fromSquare    String // E.g., "e2"
+  toSquare      String // E.g., "e4"
+  capturedPiece String? // Name of captured piece if any (e.g., "pawn")
+  timestamp     DateTime @default(now())
+
+  game Game @relation(fields: [gameId], references: [id])
+
+  @@index([gameId])
 }
 
 model VerificationToken {
