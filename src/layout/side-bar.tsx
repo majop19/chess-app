@@ -29,6 +29,7 @@ import {
 import { User } from "next-auth";
 import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
+import Link from "next/link";
 
 export const SideBar = ({ user }: { user?: User }) => {
   const { open, setOpen, isMobile } = useSidebar();
@@ -127,9 +128,14 @@ export const SideBar = ({ user }: { user?: User }) => {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <Sparkles />
-                        Upgrade to Pro
+                      <DropdownMenuItem className="font-medium">
+                        <Link
+                          href="/profile"
+                          className="flex flex-items items-center gap-2"
+                        >
+                          <BadgeCheck />
+                          Profile
+                        </Link>
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />

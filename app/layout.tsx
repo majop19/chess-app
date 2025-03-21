@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -8,6 +7,7 @@ import { Providers } from "./Provider";
 import { TailwindIndicator } from "@/components/TailwindIndicator";
 import { SideBar } from "@/layout/side-bar";
 import { getAuthSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -26,6 +26,20 @@ export default async function RootLayout({
 }>) {
   const session = await getAuthSession();
 
+  let imageUser = null;
+
+  if (session?.user.image) {
+    imageUser = await prisma.image.findUnique({
+      where: {
+        id: session?.user.image,
+        userId: session?.user.id,
+      },
+      select: {
+        url: true,
+      },
+    });
+  }
+
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <body
@@ -36,8 +50,17 @@ export default async function RootLayout({
       >
         <Providers>
           <div className="relative flex min-h-screen flex-col">
-            <SideBar user={session?.user} />
-            <div className="flex-1">{children}</div>
+            <SideBar
+              user={
+                session?.user
+                  ? {
+                      ...session?.user,
+                      image: imageUser?.url ?? session?.user.image,
+                    }
+                  : undefined
+              }
+            />
+            <div className="flex-1 min-h-screen min-w-screen">{children}</div>
           </div>
           <TailwindIndicator />
         </Providers>

@@ -5,14 +5,12 @@ import NextAuth from "next-auth";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import NodeMailer from "next-auth/providers/nodemailer";
-import { createTransport } from "nodemailer";
 
 export const {
   auth: baseAuth,
   handlers,
   signIn,
 } = NextAuth({
-  debug: true,
   adapter: PrismaAdapter(prisma),
   providers: [
     Github({
@@ -54,6 +52,7 @@ export const {
       if (!user.image) {
         user.image = `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`;
       }
+
       return true;
     },
   },
