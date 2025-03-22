@@ -26,19 +26,18 @@ export default async function RootLayout({
 }>) {
   const session = await getAuthSession();
 
-  let imageUser = null;
-
-  if (session?.user.image) {
-    imageUser = await prisma.image.findUnique({
-      where: {
-        id: session?.user.image,
-        userId: session?.user.id,
+  const image = await prisma.user.findFirst({
+    where: {
+      id: session?.user.id,
+    },
+    select: {
+      imageCloudinary: {
+        select: {
+          url: true,
+        },
       },
-      select: {
-        url: true,
-      },
-    });
-  }
+    },
+  });
 
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
@@ -55,7 +54,7 @@ export default async function RootLayout({
                 session?.user
                   ? {
                       ...session?.user,
-                      image: imageUser?.url ?? session?.user.image,
+                      image: image?.imageCloudinary?.url ?? session?.user.image,
                     }
                   : undefined
               }

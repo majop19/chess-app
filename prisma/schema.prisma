@@ -55,8 +55,7 @@ model User {
   accounts     Account[]
   sessions     Session[]
 
-  imageCloudinaryId String? @unique
-  imageCloudinary   Image?  @relation(fields: [imageCloudinaryId], references: [id], onDelete: Cascade)
+  imageCloudinary Image?
 }
 
 model Image {
@@ -68,7 +67,9 @@ model Image {
   fileType  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User?
+  userId    String   @unique
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Game {
