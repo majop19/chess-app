@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
       },
       select: {
         id: true,
+        imageCloudinary: true,
       },
     });
 
@@ -60,28 +61,47 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    // Définir un type pour les options d'upload
+    type CloudinaryUploadOptions = {
+      resource_type: "image" | "auto" | "video" | "raw" | undefined;
+      folder?: string;
+      overwrite: boolean;
+      public_id?: string;
+      invalidate: boolean; // Noter le ? qui indique que cette propriété est optionnelle
+    };
+
+    // Initialiser les options avec les valeurs obligatoires
+    const uploadOptions: CloudinaryUploadOptions = {
+      resource_type: "image",
+      overwrite: true,
+      invalidate: true,
+    };
+
+    // Ajouter le public_id seulement s'il existe déjà
+    if (user.imageCloudinary?.publicId) {
+      uploadOptions.public_id = user.imageCloudinary.publicId;
+    } else {
+      // Sinon, définir seulement le dossier pour un nouveau upload
+      uploadOptions.folder = `users/${user.id}/uploads`;
+    }
     // Upload vers Cloudinary en utilisant une promise
+
     const cloudinaryUpload = () => {
       return new Promise<any>((resolve, reject) => {
         cloudinary.uploader
-          .upload_stream(
-            {
-              resource_type: "auto",
-              folder: `users/${user.id}/uploads`,
-            },
-            (error, result) => {
-              if (error) {
-                reject(error);
-                return;
-              }
-              resolve(result);
+          .upload_stream(uploadOptions, (error, result) => {
+            if (error) {
+              reject(error);
+              return;
             }
-          )
+            resolve(result);
+          })
           .end(buffer);
       });
     };
-
+    console.log("avant upload", user.imageCloudinary);
     const result = await cloudinaryUpload();
+    console.log("upload", result);
 
     const ImageCrop = cloudinary.url(result.public_id, {
       // crop l'image en carré
@@ -91,25 +111,29 @@ export async function POST(request: NextRequest) {
       height: 500,
       quality: "auto:good",
       fetch_format: "auto",
+      version: result.version,
     });
+    console.log("image crop", ImageCrop);
+
     // Stocker les informations de l'image dans la base de données
-    const image = await prisma.image.create({
-      data: {
+    await prisma.image.upsert({
+      where: {
+        userId: user.id,
+      },
+      update: {
+        url: ImageCrop,
+        publicId: result.public_id, // Met à jour le publicId même si l'image est écrasé
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+      },
+      create: {
         url: ImageCrop,
         publicId: result.public_id,
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type,
-        userId: user.id, // Associer l'image à l'utilisateur
-      },
-    });
-
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        image: image.id,
+        userId: user.id,
       },
     });
 

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { UserNameUpdate } from "./formAction";
+import { useRef } from "react";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -37,7 +38,7 @@ const formatBytes = (bytes: number, decimals = 2) => {
 };
 
 export const formSchema = z.object({
-  name: z.optional(z.string().min(3).max(20)),
+  name: z.string().min(3).max(20).optional().or(z.literal("")),
   image: z.optional(
     z
       .instanceof(File, {
@@ -57,13 +58,26 @@ export const formSchema = z.object({
 type FormType = z.infer<typeof formSchema>;
 
 export const FormProfile = () => {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: undefined,
+      name: "",
       image: undefined,
     },
   });
+
+  const handleReset = () => {
+    // Réinitialiser le formulaire
+    form.reset();
+
+    // Réinitialiser manuellement l'input file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Efface la valeur de l'input
+    }
+  };
+
   const router = useRouter();
 
   const uploadMutation = useMutation({
@@ -83,6 +97,10 @@ export const FormProfile = () => {
 
       return response.json();
     },
+    onSuccess: () => {
+      handleReset();
+      router.refresh();
+    },
   });
 
   const onSubmit = async (values: FormType) => {
@@ -92,6 +110,7 @@ export const FormProfile = () => {
       if (res?.serverError) {
         throw new Error(res?.serverError?.serverError);
       }
+      router.refresh();
     }
     if (values.image) {
       const file = values.image;
@@ -102,7 +121,7 @@ export const FormProfile = () => {
         error: (err) => `Erreur lors du téléchargement : ${err.message}`,
       });
     }
-    router.refresh();
+    form.reset();
   };
 
   return (
@@ -123,6 +142,7 @@ export const FormProfile = () => {
                       field.onChange(file);
                     }
                   }}
+                  ref={fileInputRef}
                 />
               </FormControl>
               <FormMessage />

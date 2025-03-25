@@ -14,14 +14,16 @@ export default async function ProfilePage() {
     where: {
       id: session.user.id,
     },
-  });
-  const image = await prisma.image.findUnique({
-    where: {
-      id: session.user.image,
-      userId: session.user.id,
-    },
     select: {
-      url: true,
+      id: true,
+      name: true,
+      image: true,
+      createdAt: true,
+      imageCloudinary: {
+        select: {
+          url: true,
+        },
+      },
     },
   });
 
@@ -32,7 +34,7 @@ export default async function ProfilePage() {
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16">
             <AvatarImage
-              src={image?.url ?? user?.image ?? undefined}
+              src={user?.imageCloudinary?.url ?? user?.image ?? undefined}
               alt="Profil"
               className="rounded-md "
             />
