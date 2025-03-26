@@ -28,8 +28,8 @@ export default async function ProfilePage() {
   });
 
   return (
-    <div className="w-4xl h-4xl mx-auto p-4 items-center">
-      <div className="bg-white rounded-lg shadow p-6">
+    <div className="w-4xl h-4xl mx-auto p-4 items-center ">
+      <div className="rounded-lg shadow p-6 bg-card">
         {/* Section Profil */}
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16">
@@ -59,7 +59,7 @@ export default async function ProfilePage() {
                 text: "usdvududssdfiksd dsjbfds dsfhbdh df h. Mfjshfd",
               },
             ].map((msg) => (
-              <Card key={msg.id} className="bg-gray-100">
+              <Card key={msg.id}>
                 <CardHeader>
                   <CardTitle className="text-md font-medium">
                     {msg.sender}

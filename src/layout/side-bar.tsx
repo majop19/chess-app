@@ -14,6 +14,9 @@ import {
   CreditCard,
   LogIn,
   LogOut,
+  Moon,
+  Sun,
+  SunMoon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -22,18 +25,24 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User } from "next-auth";
 import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 export const SideBar = ({ user }: { user?: User }) => {
   const { open, setOpen, isMobile } = useSidebar();
   const [closeTimeout, setCloseTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { setTheme } = useTheme();
 
   const handleMouseEnter = async () => {
     if (closeTimeout) {
@@ -139,10 +148,24 @@ export const SideBar = ({ user }: { user?: User }) => {
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <BadgeCheck />
-                        Account
-                      </DropdownMenuItem>
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                          <SunMoon />
+                          Theme
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent>
+                            <DropdownMenuItem onClick={() => setTheme("light")}>
+                              <Sun />
+                              Light
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setTheme("dark")}>
+                              <Moon />
+                              Dark
+                            </DropdownMenuItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
                       <DropdownMenuItem>
                         <CreditCard />
                         Billing
