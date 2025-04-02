@@ -1,13 +1,5 @@
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { ChessGameProfile } from "./play/chessGameProfile";
 
 export default function Home() {
-  return (
-    <div>
-      <Card>
-        <CardContent>
-          <CardTitle>Salut !</CardTitle>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  return <ChessGameProfile />;
 }

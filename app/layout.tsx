@@ -48,7 +48,7 @@ export default async function RootLayout({
         )}
       >
         <Providers>
-          <div className="relative flex min-h-screen flex-col">
+          <div className="relative flex min-h-screen min-w-screen flex-col justify-center">
             <SideBar
               user={
                 session?.user
@@ -59,7 +59,7 @@ export default async function RootLayout({
                   : undefined
               }
             />
-            <div className="flex-1 min-h-screen min-w-screen">{children}</div>
+            <div className="flex w-full justify-center">{children}</div>
           </div>
           <TailwindIndicator />
         </Providers>
