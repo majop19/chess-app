@@ -8,9 +8,6 @@ export type UsersInfoType = {
   id: string;
   name: string | null;
   image: string | null;
-  imageCloudinary: {
-    url: string;
-  } | null;
 };
 
 export const ChessGameProfile = async () => {
@@ -21,11 +18,6 @@ export const ChessGameProfile = async () => {
       id: true,
       name: true,
       image: true,
-      imageCloudinary: {
-        select: {
-          url: true,
-        },
-      },
     },
   });
 

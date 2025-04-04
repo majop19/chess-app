@@ -56,9 +56,7 @@ export const UserGameProfile = ({
   return (
     <div className="flex flex-items gap-2 p-3 w-[720px] items-center">
       <Avatar className="size-14">
-        <AvatarImage
-          src={user.imageCloudinary?.url ?? user.image ?? undefined}
-        />
+        <AvatarImage src={user.image ?? undefined} />
         <AvatarFallback></AvatarFallback>
       </Avatar>
       <p className="font-medium text-xl">{user.name}</p>

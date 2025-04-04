@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { UserNameUpdate } from "./formAction";
 import { useRef } from "react";
+import supabase from "@/lib/superbase";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -86,7 +87,7 @@ export const FormProfile = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/api/upload", {
+      const response = await fetch("api/image/upload", {
         method: "POST",
         body: formData,
       });

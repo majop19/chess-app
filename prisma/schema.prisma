@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Account {
@@ -55,21 +56,6 @@ model User {
   accounts     Account[]
   sessions     Session[]
 
-  imageCloudinary Image?
-}
-
-model Image {
-  id        String   @id @default(cuid())
-  url       String
-  publicId  String // Cloudinary public_id
-  fileName  String?
-  fileSize  Int?
-  fileType  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String   @unique
-
-  user User @relation(fields: [userId], references: [id])
 }
 
 model Game {
